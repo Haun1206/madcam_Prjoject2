@@ -1,10 +1,4 @@
 package com.example.tabswithanimatedswipe;
-
-import android.Manifest;
-import android.app.AlertDialog;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,20 +13,25 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Environment;
-import android.os.SystemClock;
-import android.provider.MediaStore;
-import android.provider.Settings;
-import android.util.DisplayMetrics;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,339 +40,141 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import yuku.ambilwarna.AmbilWarnaDialog;
 
 import static android.os.Environment.DIRECTORY_PICTURES;
 
-public class TabFragment3 extends Fragment implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+public class TabFragment3 extends Fragment implements View.OnClickListener{
     /* Define Variables */
     private static final int MY_PERMISSION_EXTERNAL_WRITE = 4444;
 
-    private Button draw_red_btn;
-    private Button draw_blue_btn;
-    private Button draw_green_btn;
-    private Button clearbtn;
-    private Button eraser_btn;
-    private Button custombtn;
-    private Button save_color_btn;
-    private Button option_btn;
-    int tColor;
-    private SimpleDrawingView paintview;
-    private SimpleDrawingView new_paintview;
-    SeekBar seek;
-    String token;
-
-    SeekBar.OnSeekBarChangeListener mSeekBar = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            paintview.change_size(i);
-            paintview.invalidate();
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private Animation fab_open, fab_close;
+    private Boolean isFabOpen = false;
+    FloatingActionButton fab, fab1, fab2;
+    View view;
+    ArrayList<DashData> myDataset;
+    DashData dashData;
+    //Nodejsd 부분
+    public static Retrofit retrofit;
+    public static ApiService sRf;
+    BoardAdapter boardAdapter;
+    public static String BASE_URL = "http://192.249.19.242:7580";
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_object3, container, false);
-    }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_object3, container, false);
+        recyclerView = view.findViewById(R.id.dash_recycler_view);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        paintview = (SimpleDrawingView) view.findViewById(R.id.simpleDrawingView1);
-        new_paintview = (SimpleDrawingView) view.findViewById(R.id.simpleDrawingView1);
-        DisplayMetrics metrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        paintview.init(metrics, null);
+        fab_open = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.fab_close);
+        fab = view.findViewById(R.id.fab);
+        fab1 = view.findViewById(R.id.fab1);
+        fab2 = view.findViewById(R.id.fab2);
 
-        /* Buttons */
-        draw_red_btn = (Button) view.findViewById(R.id.draw_red_btn);
-        draw_red_btn.setOnClickListener(this);
+        fab.setOnClickListener(this);
+        fab1.setOnClickListener(this);
+        fab2.setOnClickListener(this);
 
-        draw_blue_btn = (Button) view.findViewById(R.id.draw_blue_btn);
-        draw_blue_btn.setOnClickListener(this);
+        //Nodejs 연결
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        sRf = retrofit.create(ApiService.class);
 
-        draw_green_btn = (Button) view.findViewById(R.id.draw_green_btn);
-        draw_green_btn.setOnClickListener(this);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        recyclerView.setHasFixedSize(true);
 
-        clearbtn = (Button) view.findViewById(R.id.clearbtn);
-        clearbtn.setOnClickListener(this);
-
-        eraser_btn = (Button) view.findViewById(R.id.eraser_btn);
-        eraser_btn.setOnClickListener(this);
-
-        custombtn = (Button) view.findViewById(R.id.custombtn);
-        custombtn.setOnClickListener(this);
-
-        save_color_btn = (Button) view.findViewById(R.id.save_color_btn);
-        save_color_btn.setOnClickListener(this);
-
-        option_btn = (Button) view.findViewById(R.id.option_btn);
-        option_btn.setOnClickListener(this);
-
-        /* SeekBar */
-        seek = (SeekBar) view.findViewById(R.id.simpleSeekBar);
-        seek.setOnSeekBarChangeListener(mSeekBar);
-        seek.setMax(40);
-        seek.setProgress(10);
-    }
-
-    // Obtain MotionEvent object
-    long downTime = SystemClock.uptimeMillis();
-    long eventTime = SystemClock.uptimeMillis() + 100;
-    float x = 0.0f;
-    float y = 0.0f;
-    // List of meta states found here: developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
-    int metaState = 0;
-    MotionEvent motionEvent = MotionEvent.obtain(
-            downTime,
-            eventTime,
-            MotionEvent.ACTION_UP,
-            x,
-            y,
-            metaState
-    );
+        // use a linear layout manager
+        myDataset = new ArrayList<>();
+        mAdapter = new BoardAdapter(myDataset);
+        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(mAdapter);
 
 
-    /* for setting background */
-    private void openColorPicker_bg() {
-        AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(getActivity(), tColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+
+        /** Fetch Data */
+        Call<InitData> call = sRf.executeGet();
+        call.enqueue(new Callback<InitData>() {
             @Override
-            public void onCancel(AmbilWarnaDialog dialog) {
+            public void onResponse(Call<InitData> call, Response<InitData> response) {
+                if(response.code() == 200){
+                    JsonArray ja = response.body().getData();
+                    for(int i=0; i<ja.size();i++){
+                        //배열에있는 오브젝트를 가져와 이름 전화번호 추출
+                        JsonObject jo = ja.get(i).getAsJsonObject();
+                        String title = jo.get("title").getAsString();
+                        String name = jo.get("name").getAsString();
+                        String click = jo.get("click").getAsString();
+                        String contents = jo.get("content").getAsString();
 
-            }
+                        //어댑터에 넘겨줘서 화면에 뷰
+                        DashData dashData = new DashData(title, name, click, contents);
+                        myDataset.add(dashData);
+                        mAdapter.notifyDataSetChanged();
+                    }
 
-            @Override
-            public void onOk(AmbilWarnaDialog dialog, int color) {
-                paintview.setbgcolor(color);
-                paintview.dispatchTouchEvent(motionEvent);
-            }
-        });
-        colorPicker.show();
-    }
-
-    /*for picking custom color */
-    private void openColorPicker() {
-        AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(getActivity(), tColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-            @Override
-            public void onCancel(AmbilWarnaDialog dialog) {
-
-            }
-
-            @Override
-            public void onOk(AmbilWarnaDialog dialog, int color) {
-                paintview.setColor(color);
-                save_color_btn.setBackgroundColor(color);
-            }
-        });
-        colorPicker.show();
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.draw_red_btn:
-                paintview.red();
-                break;
-            case R.id.draw_blue_btn:
-                paintview.blue();
-                break;
-            case R.id.draw_green_btn:
-                paintview.green();
-                break;
-            case R.id.clearbtn:
-                paintview.clear();
-                break;
-            case R.id.eraser_btn:
-                paintview.erase();
-                break;
-            case R.id.custombtn:
-                openColorPicker();
-                break;
-            case R.id.save_color_btn:
-                ColorDrawable saved_color = (ColorDrawable)save_color_btn.getBackground();
-                int save = saved_color.getColor();
-                paintview.saveColor(save);
-                break;
-            case R.id.option_btn:
-                PopupMenu popup = new PopupMenu(getActivity(), v);
-                popup.setOnMenuItemClickListener(this);
-                popup.inflate(R.menu.menu_main);
-                popup.show();
-                break;
-        }
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.normal:
-                paintview.normal();
-                return true;
-            case R.id.emboss:
-                paintview.emboss();
-                return true;
-            case R.id.blur:
-                paintview.blur();
-                return true;
-            case R.id.save:
-                token = createAdditionDialog();
-                return true;
-            case R.id.open:
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_PICK);
-                startActivityForResult(intent, 111);
-                return true;
-            case R.id.setBackground:
-                openColorPicker_bg();
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    @Override //갤러리에서 이미지 불러온 후 행동
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == 111) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                try {
-                    // 선택한 이미지에서 비트맵 생성
-                    InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
-                    Bitmap img = BitmapFactory.decodeStream(in);
-                    in.close();
-                    // 이미지뷰에 세팅
-                    DisplayMetrics metrics = new DisplayMetrics();
-                    getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                    new_paintview.init(metrics, img);
-                    new_paintview.invalidate();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                }
+                else if (response.code() == 400){
+                    //Toast.makeText(MainActivity.this, "Fail", Toast.LENGTH_SHORT).show();
                 }
             }
+            @Override
+            public void onFailure(Call<InitData> call, Throwable t) {
+                //Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        return view;
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id) {
+            case R.id.fab:
+                anim();
+                break;
+            case R.id.fab1:
+                anim();
+                Intent intent1 = new Intent(getActivity().getApplicationContext(), MainActivity.class);
+                startActivityForResult(intent1, 1001);
+                break;
+            case R.id.fab2:
+                anim();
+                Intent intent = new Intent(getActivity().getApplicationContext(), UploadDashboardActivity.class);
+                startActivityForResult(intent, 1001);
+                break;
         }
     }
 
-    private String createAdditionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
-        final String[] name = new String[1];
-        MenuItem item = null;
-
-        /* Inflate and set the layout for the dialog */
-        /* Pass null as the parent view because its going in the dialog layout */
-        View dialog_layout = inflater.inflate(R.layout.save_picture, null);
-        builder.setView(dialog_layout)
-        /* Add Action Buttons */
-                .setPositiveButton(R.string.dialog_positive_button_string, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        /* Add filename to list and save picture */
-                        EditText editText_filename = dialog_layout.findViewById(R.id.filename);
-
-                        name[0] = editText_filename.getText().toString();
-
-                        if (name[0].isEmpty()) {
-                            Toast.makeText(getActivity(), "정보를 모두 입력해 주세요.", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        checkExternalWritePermission(item, name[0]);
-                    }
-                })
-                .setNegativeButton(R.string.dialog_negative_button_string, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // do nothing
-                    }
-                })
-                .setCancelable(false)
-                .create()
-                .show();
-        return name[0];
-    }
-
-
-    private void checkExternalWritePermission(MenuItem item, String name) {
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("알림")
-                        .setMessage("저장소 권한이 거부되었습니다. 사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다.")
-                        .setNeutralButton("설정", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
-                                startActivity(intent);
-                                Toast.makeText(getActivity(), "외부 저장소 권한을 활성화 하셔야 합니다.", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(getActivity(), "외부 저장소 권한을 활성화 하셔야 합니다.", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .setCancelable(false)
-                        .create()
-                        .show();
-            } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        MY_PERMISSION_EXTERNAL_WRITE);
-            }
+    public void anim() {
+        if (isFabOpen) {
+            fab1.startAnimation(fab_close);
+            fab2.startAnimation(fab_close);
+            fab1.setClickable(false);
+            fab2.setClickable(false);
+            isFabOpen = false;
         } else {
-            // permssion 있을 때 할 일
-            paintview.invalidate();
-            paintview.buildDrawingCache();
-            Bitmap bitmap = paintview.getDrawingCache();
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Pictures/" + name + ".png");
-            FileOutputStream out;
-            try {
-                out = new FileOutputStream(file);
-                if(out != null){
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 75, out);
-                    Toast.makeText(getActivity(), "Save Success", Toast.LENGTH_SHORT).show();
-                }
-                out.close();
-            }
-            catch (IOException e){
-                e.printStackTrace();
-                Toast.makeText(getActivity(), "File Not Found", Toast.LENGTH_SHORT).show();
-            }
+            fab1.startAnimation(fab_open);
+            fab2.startAnimation(fab_open);
+            fab1.setClickable(true);
+            fab2.setClickable(true);
+            isFabOpen = true;
         }
     }
+
+
 }

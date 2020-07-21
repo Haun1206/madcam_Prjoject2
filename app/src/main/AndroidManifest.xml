@@ -50,6 +50,8 @@
         </activity>
 
         <activity android:name=".UploadActivity"> </activity>
+        <activity android:name=".DashboardActivity"> </activity>
+        <activity android:name=".UploadDashboardActivity"> </activity>
     </application>
 
 </manifest>

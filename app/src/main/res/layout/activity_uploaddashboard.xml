@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="30dp">
+    </TextView>
+    <EditText
+        android:id ="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </EditText>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Image"
+            android:textSize="30dp">
+
+        </TextView>
+
+        <Button
+            android:id="@+id/upload_image"
+            android:layout_width="111dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="50dp"
+            android:text="Image"
+            android:textSize="20sp">
+
+        </Button>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/dashupload_image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_horizontal">
+    </ImageView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Content"
+        android:textSize="30dp">
+    </TextView>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp">
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:textSize="20dp">
+        </EditText>
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/upload"
+        android:layout_width="115dp"
+        android:layout_height="68dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Upload"
+        android:textSize="20sp">
+
+    </Button>
+
+
+
+
+</LinearLayout>

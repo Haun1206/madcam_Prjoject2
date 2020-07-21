@@ -25,7 +25,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.tabswithanimatedswipe.models.ImageResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,10 +46,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.example.tabswithanimatedswipe.UploadDashboardActivity.is_dash;
 
 public class UploadActivity extends AppCompatActivity implements View.OnClickListener {
     ApiService apiService;
@@ -61,6 +65,7 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
     FloatingActionButton fabCamera, fabUpload;
     Bitmap mBitmap;
     TextView textView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +99,11 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
     private void initRetrofitClient() {
         OkHttpClient client = new OkHttpClient.Builder().build();
 
-        apiService = new Retrofit.Builder().baseUrl("http://192.249.19.243:8680/").client(client).build().create(ApiService.class);
+        apiService = new Retrofit.Builder()
+                .baseUrl("http://192.249.19.243:8680/")
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build().create(ApiService.class);
     }
 
     public Intent getPickImageChooserIntent() {
@@ -286,10 +295,10 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
             MultipartBody.Part body = MultipartBody.Part.createFormData("upload", file.getName(), reqFile);
             RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload");
 
-            Call<ResponseBody> req = apiService.postImage(body, name);
-            req.enqueue(new Callback<ResponseBody>() {
+            Call<ImageResponse> req = apiService.postImage(body, name);
+            req.enqueue(new Callback<ImageResponse>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                public void onResponse(Call<ImageResponse> call, Response<ImageResponse> response) {
 
                     if (response.code() == 200) {
                         textView.setText("Uploaded Successfully!");
@@ -297,10 +306,17 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
                     }
 
                     Toast.makeText(getApplicationContext(), "Uploaded Successfully!", Toast.LENGTH_SHORT).show();
+                    if (is_dash){
+                        System.out.println("-----------------------------" + response.body().getName());
+                        Intent intent = new Intent(UploadActivity.this, UploadDashboardActivity.class);
+                        intent.putExtra("imgname", response.body().getName());
+                        startActivity(intent);
+                        finish();
+                    }
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(Call<ImageResponse> call, Throwable t) {
                     textView.setText("Uploaded Failed!");
                     textView.setTextColor(Color.RED);
                     Toast.makeText(getApplicationContext(), "Request failed", Toast.LENGTH_SHORT).show();

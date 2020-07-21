@@ -194,8 +194,8 @@ public class TabFragment2 extends Fragment implements View.OnClickListener{
 
                                 for(int i = 0; i < len; i++){
                                     response_array_gallery.add("http://192.249.19.243:8680/uploads/" + response_array.get(i).getName());
-
                                 }
+
                                 imageAdapter.setItems(response_array_gallery);
                                 imageAdapter.notifyDataSetChanged();
 
