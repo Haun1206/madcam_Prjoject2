@@ -1,0 +1,104 @@
+var express = require('express')
+var data = require('../model/phonebook')
+var bodyParser = require('body-parser')  //body의 json을 파싱해주는 모듈
+var stringify = require("json-stringify-pretty-compact")  //json 값을 문자열로 (보기좋게) 변환해주는 모듈
+var empty = require('is-empty')
+ 
+
+const router = express.Router()
+
+router.use(bodyParser.urlencoded({extended:true}))
+router.use(bodyParser.json())
+
+//실제 주소: http://~~/api/phonebook/+body 데이터
+
+// 전체 데이터를 불러와서 항목별로 보기
+router.get('/', function(req, res){
+    data.find(function(error, datas){
+        var resultData = "";
+        if(!error && !empty(datas)){
+            resultData = datas
+            console.log(resultData)
+            res.status(200).send(JSON.stringify({result: empty(error), error:error, data:resultData}))
+        } else{
+            res.status(400).send(JSON.stringify({result: false, error:null, data:null}))
+        }
+    })
+})
+
+//id 기반으로 조회하여 데이터를 1건 불러오기
+router.get('/:id', function(req, res){
+    data.findOne({_id:req.params.id}, function(error, datas){
+        var resultData = ""
+        if(!error && !empty(data)){
+            resultData = datas
+        }
+        res.json({result: empty(error), error:error, data:resultData})
+    })
+})
+
+
+
+//사용자 데이터를 추가하기
+router.post('/', function(req, res){
+    var name = req.body.name;
+    var number = req.body.number;
+    if(!empty(name) && !empty(number)){
+        var Data = new data()
+        Data.name= name
+        Data.number = number
+        console.log("content data ::" + Data)
+        Data.save(function(error, resultData){
+            res.status(200).send(JSON.stringify({result: empty(error), error:error, data:resultData}))
+        })
+    }
+    else{
+        res.status(400).send(JSON.stringify({result: false, error:null, data:null}))
+    }
+})
+
+
+//id로 데이터를 찾아서 수정
+router.put('/:id', function(req, res){
+    var name = req.body.name
+    var number = req.body.number
+    const id = req.params.id
+
+    if(!empty(id)){
+        data.findOneAndUpdate({_id: id}, {$set:
+                {name: name, number: number}
+        }, {returnNewDocument:true}, (error, doc)=>{
+                res.json({result: !error, error:error})
+        })
+    }
+    else{
+        res.json({result: false, error:null, data:null})
+    }
+})
+
+//전화번호를 찾아서 삭제, body에 는 번호 String이 있음
+router.delete('/', function(req, res){
+    var number = req.body.number
+    if(!empty(number)){
+        data.remove({number: number}, function(error, resultData){
+            res.status(200).send(JSON.stringify({result: empty(error), error:error, data:resultData}))
+        })
+    }
+    else{
+        res.status(400).send(JSON.stringify({result: false, error:null, data:null}))
+    }
+})
+
+router.delete('/:id', function(req, res){
+    const id = req.params.id
+    if(!empty(id)){
+        data.remove({_id: id}, function(error, resultData){
+            res.status(200).send(JSON.stringify({result: empty(error), error:error, data:resultData}))
+        })
+    }
+    else{
+        res.status(400).send(JSON.stringify({result: false, error:null, data:null}))
+    }
+})
+
+module.exports = router

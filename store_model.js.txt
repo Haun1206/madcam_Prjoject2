@@ -1,0 +1,8 @@
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017')
+.then(()=>console.log('MongoDB Connected....'))
+.catch(err => console.log(err))
+
+var Schema = mongoose.Schema
+var storeSchema = new Schema({number:String, title : String, name: String, click: Number, content: Object})
+module.exports = mongoose.model('store', storeSchema, 'store')
