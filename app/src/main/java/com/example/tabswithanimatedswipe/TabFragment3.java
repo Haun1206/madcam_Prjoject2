@@ -60,7 +60,7 @@ public class TabFragment3 extends Fragment implements View.OnClickListener{
     private Boolean isFabOpen = false;
     FloatingActionButton fab, fab1, fab2;
     View view;
-    ArrayList<DashData> myDataset;
+    public static ArrayList<DashData> myDataset;
     DashData dashData;
     //Nodejsd 부분
     public static Retrofit retrofit;
@@ -97,7 +97,7 @@ public class TabFragment3 extends Fragment implements View.OnClickListener{
 
         // use a linear layout manager
         myDataset = new ArrayList<>();
-        mAdapter = new BoardAdapter(myDataset);
+        mAdapter = new BoardAdapter(myDataset, getContext());
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(mAdapter);
@@ -114,14 +114,15 @@ public class TabFragment3 extends Fragment implements View.OnClickListener{
                     for(int i=0; i<ja.size();i++){
                         //배열에있는 오브젝트를 가져와 이름 전화번호 추출
                         JsonObject jo = ja.get(i).getAsJsonObject();
+                        String number = jo.get("number").getAsString();
                         String title = jo.get("title").getAsString();
                         String name = jo.get("name").getAsString();
                         String click = jo.get("click").getAsString();
                         String contents = jo.get("content").getAsString();
 
                         //어댑터에 넘겨줘서 화면에 뷰
-                        DashData dashData = new DashData(title, name, click, contents);
-                        myDataset.add(dashData);
+                        DashData dashData = new DashData(number, title, name, click, contents);
+                        myDataset.add(0, dashData);
                         mAdapter.notifyDataSetChanged();
                     }
 

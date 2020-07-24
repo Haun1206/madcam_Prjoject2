@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="300dp"
     android:layout_height="wrap_content">
 
     <TextView
@@ -38,5 +38,12 @@
         android:inputType="phone"
         android:textAlignment="viewStart"
         android:maxLength="50"/>
+    <Button
+        android:id="@+id/addbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "추가"
+        android:layout_gravity="center"/>
+
 
 </LinearLayout>

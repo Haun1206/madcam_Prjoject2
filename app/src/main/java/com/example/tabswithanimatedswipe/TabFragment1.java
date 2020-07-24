@@ -170,11 +170,11 @@ public class TabFragment1 extends Fragment {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                View v = LayoutInflater.from(getActivity()).inflate(R.layout.edit_box, null, false);
+                View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_addcontact, null, false);
                 builder.setView(v);
                 final Button ButtonSubmit = (Button) v.findViewById(R.id.addbutton);
                 final EditText editName = (EditText) v.findViewById(R.id.name);
-                final EditText editNumber = (EditText) v.findViewById(R.id.number);
+                final EditText editNumber = (EditText) v.findViewById(R.id.phone_number);
 
 
                 final AlertDialog dialog = builder.create();

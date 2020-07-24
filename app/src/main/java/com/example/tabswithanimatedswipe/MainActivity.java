@@ -48,17 +48,17 @@ public class MainActivity<val> extends FragmentActivity {
         pagerAdapter = new TapPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setPageTransformer(new ZoomOutPageTransformer());
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                if ((position + 1) == 3) {
-                    // 그림판(3번탭)에 들어갔을 때에는 스와이프 비활성화
-                    viewPager.setUserInputEnabled(false);
-                } else {
-                    viewPager.setUserInputEnabled(true);
-                }
-            }
-        });
+//        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                if ((position + 1) == 3) {
+//                    // 그림판(3번탭)에 들어갔을 때에는 스와이프 비활성화
+//                    viewPager.setUserInputEnabled(false);
+//                } else {
+//                    viewPager.setUserInputEnabled(true);
+//                }
+//            }
+//        });
 
         tabLayout = findViewById(R.id.tab_layout);
         new TabLayoutMediator(tabLayout, viewPager,
@@ -72,10 +72,10 @@ public class MainActivity<val> extends FragmentActivity {
                 tab.setText("연락처");
                 break;
             case 2 :
-                tab.setText("이미지");
+                tab.setText("갤러리");
                 break;
             case 3 :
-                tab.setText("그림판");
+                tab.setText("게시판");
                 break;
         }
     }

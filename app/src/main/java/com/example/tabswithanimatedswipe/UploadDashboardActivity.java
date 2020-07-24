@@ -21,6 +21,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import static com.example.tabswithanimatedswipe.TabFragment3.sRf;
+import static com.example.tabswithanimatedswipe.TabFragment3.myDataset;
 
 public class UploadDashboardActivity extends AppCompatActivity {
 
@@ -54,6 +55,14 @@ public class UploadDashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 HashMap<String, String> map = new HashMap<>();
+                //글 목록 수 추가
+                if(myDataset.size() == 0){
+                    map.put("number", "1");
+                } else{
+                    DashData dd = myDataset.get(0);
+                    int next_number = Integer.parseInt(dd.getNumber())+1;
+                    map.put("number",Integer.toString(next_number));
+                }
                 map.put("title", title.getText().toString());
                 map.put("name", "Haun");
                 map.put("click", "0");
@@ -65,7 +74,7 @@ public class UploadDashboardActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<DashResult> call, Response<DashResult> response) {
                         if (response.code() == 200) {
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), TabFragment3.class);
                             startActivityForResult(intent, 1001);
                             finish();
                             //Toast.makeText(, "Success", Toast.LENGTH_SHORT).show();

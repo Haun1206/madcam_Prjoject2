@@ -6,6 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <TextView
+        android:id="@+id/product"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.053" />
+
     <ImageView
         android:id="@+id/product_image"
         android:layout_width="328dp"
@@ -16,33 +30,20 @@
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.09"
+        app:layout_constraintVertical_bias="0.229"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:layout_width="328dp"
-        android:layout_height="100dp"
-        android:id="@+id/product"
-        android:textSize="40sp"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/product_image"
-        app:layout_constraintVertical_bias="0.107" />
-
-    <TextView
-        android:layout_width="328dp"
-        android:layout_height="73dp"
         android:id="@+id/price"
-        android:textSize="30sp"
+        android:layout_width="328dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/product"
-        app:layout_constraintVertical_bias="0.107" />
+        app:layout_constraintVertical_bias="0.574" />
 
     <Button
         android:layout_width="101dp"

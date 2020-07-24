@@ -14,6 +14,7 @@ package com.example.tabswithanimatedswipe;
         import retrofit2.http.HTTP;
         import retrofit2.http.Multipart;
         import retrofit2.http.POST;
+        import retrofit2.http.PUT;
         import retrofit2.http.Part;
 
 interface ApiService {
@@ -29,6 +30,9 @@ interface ApiService {
 
     @POST("/api/store")
     Call<DashResult> executePost(@Body HashMap<String, String> map);
+
+    @PUT("/api/store")
+    Call<ResponseBody> executePut(@Body HashMap<String, String> map);
 
     @HTTP(method = "DELETE", path = "/api/store", hasBody = true)
     Call<ResponseBody> executeDelete(@Body HashMap<String, String> map);
