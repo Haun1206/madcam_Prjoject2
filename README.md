@@ -11,9 +11,9 @@
   &#10158; 오른쪽 하단에 등록버튼 추가 <br>
   &#10158; 버튼 클릭 후 게시물 사진 등록, 제목, 글 입력 <br>
   &#10158; 확인 버튼 누르면 게시물 등록, 목록에 올려지고 디비에 저장됨 <br>
-  &#10158; 사용자가 게시물 확인시 조회수 증가 -> 디비에 업데이트
+  &#10158; 사용자가 게시물 확인시 조회수 증가 -> 디비에 업데이트<br>
 
 
-##Collaborators
-&#9998; [Haun Kim]: https://github.com/Haun1206 
-&#9998; [Chanhee Lee]: https://github.com/chanhee015 
+## Collaborators
+&#9998; [Haun Kim](https://github.com/Haun1206) <br>
+&#9998; [Chanhee Lee](https://github.com/chanhee015) <br>
